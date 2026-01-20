@@ -2,8 +2,9 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>큐싱 피싱 인식 훈련 게임 - SecuQuest</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>큐싱 피싱 인식 훈련 - SecuQuest</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -11,119 +12,139 @@
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            min-height: 100vh;
-            color: #fff;
+        :root {
+            --primary-red: #e94560;
+            --primary-blue: #00d9ff;
+            --dark-bg: #0f0f1a;
+            --card-bg: rgba(255, 255, 255, 0.03);
         }
 
-        .container {
-            max-width: 900px;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(180deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* Container */
+        .app-container {
+            max-width: 420px;
             margin: 0 auto;
-            padding: 20px;
+            min-height: 100vh;
+            position: relative;
         }
 
         /* Header */
-        .header {
+        .main-header {
             text-align: center;
-            padding: 30px 0;
-            border-bottom: 2px solid #e94560;
-            margin-bottom: 30px;
+            padding: 30px 20px 20px;
+            background: linear-gradient(180deg, rgba(233, 69, 96, 0.1) 0%, transparent 100%);
         }
 
-        .header h1 {
-            font-size: 2.5em;
-            color: #e94560;
-            text-shadow: 0 0 20px rgba(233, 69, 96, 0.5);
-            margin-bottom: 10px;
+        .main-header h1 {
+            font-size: 1.8em;
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
         }
 
-        .header p {
-            color: #a0a0a0;
-            font-size: 1.1em;
-        }
-
-        /* Score Board */
-        .score-board {
-            display: flex;
-            justify-content: space-around;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 30px;
-            backdrop-filter: blur(10px);
-        }
-
-        .score-item {
-            text-align: center;
-        }
-
-        .score-item .label {
-            color: #a0a0a0;
+        .main-header p {
+            color: #888;
             font-size: 0.9em;
-            margin-bottom: 5px;
-        }
-
-        .score-item .value {
-            font-size: 2em;
-            font-weight: bold;
-            color: #00d9ff;
-        }
-
-        .score-item .value.danger {
-            color: #e94560;
-        }
-
-        .score-item .value.success {
-            color: #4ade80;
         }
 
         /* Start Screen */
         .start-screen {
-            text-align: center;
-            padding: 60px 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
+            padding: 20px;
         }
 
-        .start-screen h2 {
-            font-size: 2em;
+        .hero-section {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .hero-icon {
+            font-size: 4em;
             margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .hero-title {
+            font-size: 1.5em;
+            margin-bottom: 15px;
             color: #fff;
         }
 
-        .start-screen p {
-            color: #a0a0a0;
+        .hero-desc {
+            color: #aaa;
+            line-height: 1.7;
             margin-bottom: 30px;
-            line-height: 1.8;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
+            font-size: 0.95em;
         }
 
-        .warning-box {
-            background: rgba(233, 69, 96, 0.2);
-            border: 1px solid #e94560;
-            border-radius: 10px;
+        .scenario-preview {
+            background: var(--card-bg);
+            border-radius: 16px;
             padding: 20px;
-            margin: 30px 0;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
-        .warning-box h3 {
-            color: #e94560;
-            margin-bottom: 10px;
+        .scenario-preview h3 {
+            color: var(--primary-blue);
+            font-size: 0.85em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .scenario-list {
+            list-style: none;
+        }
+
+        .scenario-list li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.9em;
+            color: #ccc;
+        }
+
+        .scenario-list li:last-child {
+            border-bottom: none;
+        }
+
+        .scenario-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1em;
         }
 
         .btn {
-            padding: 15px 40px;
-            font-size: 1.2em;
+            width: 100%;
+            padding: 16px;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
+            font-size: 1em;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-weight: bold;
+            margin-bottom: 12px;
         }
 
         .btn-primary {
@@ -132,1257 +153,1988 @@
         }
 
         .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(233, 69, 96, 0.3);
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255,255,255,0.05);
             color: #fff;
-            border: 2px solid #00d9ff;
-            margin-left: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        .btn-secondary:hover {
-            background: rgba(0, 217, 255, 0.2);
+        /* Phone Mockup */
+        .phone-mockup {
+            background: #1a1a1a;
+            border-radius: 45px;
+            padding: 12px;
+            margin: 20px auto;
+            max-width: 375px;
+            box-shadow:
+                0 0 0 3px #2a2a2a,
+                0 20px 60px rgba(0,0,0,0.5),
+                inset 0 0 20px rgba(255,255,255,0.05);
+            position: relative;
         }
 
-        /* Game Screen */
-        .game-screen {
-            display: none;
-        }
-
-        .scenario-container {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 20px;
-            backdrop-filter: blur(10px);
-        }
-
-        .scenario-header {
+        .phone-notch {
+            width: 150px;
+            height: 30px;
+            background: #1a1a1a;
+            border-radius: 0 0 20px 20px;
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
             display: flex;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            justify-content: center;
+            gap: 8px;
         }
 
-        .scenario-type {
-            background: #e94560;
-            color: #fff;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: bold;
+        .phone-camera {
+            width: 12px;
+            height: 12px;
+            background: #2a2a2a;
+            border-radius: 50%;
+            border: 2px solid #3a3a3a;
         }
 
-        .scenario-number {
-            margin-left: auto;
-            color: #a0a0a0;
-        }
-
-        /* Email Simulation */
-        .email-sim {
-            background: #fff;
-            border-radius: 10px;
-            overflow: hidden;
-            color: #333;
-        }
-
-        .email-header {
-            background: #f5f5f5;
-            padding: 15px 20px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .email-from, .email-to, .email-subject {
-            margin-bottom: 8px;
-            font-size: 0.95em;
-        }
-
-        .email-from span, .email-to span, .email-subject span {
-            color: #666;
-        }
-
-        .email-from strong {
-            color: #1a73e8;
-        }
-
-        .suspicious {
-            color: #e94560 !important;
-            background: rgba(233, 69, 96, 0.1);
-            padding: 2px 5px;
+        .phone-speaker {
+            width: 50px;
+            height: 6px;
+            background: #2a2a2a;
             border-radius: 3px;
-        }
-
-        .email-body {
-            padding: 25px;
-            line-height: 1.8;
-        }
-
-        .email-body p {
-            margin-bottom: 15px;
-        }
-
-        .qr-container {
-            text-align: center;
-            padding: 20px;
-            margin: 20px 0;
-            background: #f9f9f9;
-            border-radius: 10px;
-        }
-
-        .fake-qr {
-            width: 150px;
-            height: 150px;
-            background: repeating-linear-gradient(
-                0deg,
-                #000 0px,
-                #000 5px,
-                #fff 5px,
-                #fff 10px
-            );
-            background-size: 10px 10px;
-            margin: 0 auto 15px;
-            position: relative;
-            border: 3px solid #000;
-        }
-
-        .fake-qr::before {
-            content: '';
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            width: 30px;
-            height: 30px;
-            background: #000;
-            border: 5px solid #fff;
-            outline: 5px solid #000;
-        }
-
-        .fake-qr::after {
-            content: '';
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            width: 30px;
-            height: 30px;
-            background: #000;
-            border: 5px solid #fff;
-            outline: 5px solid #000;
-        }
-
-        .qr-label {
-            color: #666;
-            font-size: 0.9em;
-        }
-
-        /* Phone Simulation */
-        .phone-sim {
-            max-width: 350px;
-            margin: 0 auto;
-            background: #1a1a1a;
-            border-radius: 40px;
-            padding: 15px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
         }
 
         .phone-screen {
             background: #fff;
-            border-radius: 25px;
+            border-radius: 35px;
             overflow: hidden;
-            color: #333;
+            min-height: 600px;
         }
 
         .phone-status-bar {
-            background: #333;
-            color: #fff;
-            padding: 10px 20px;
-            font-size: 0.8em;
+            background: #f8f8f8;
+            padding: 12px 24px;
             display: flex;
             justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #000;
+            padding-top: 35px;
         }
 
-        .phone-content {
-            padding: 0;
+        .status-icons {
+            display: flex;
+            gap: 5px;
+            align-items: center;
         }
 
-        /* Fake Login Page */
-        .fake-login {
-            padding: 30px 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .fake-login-box {
+        /* Gmail Style Email */
+        .gmail-container {
             background: #fff;
-            border-radius: 15px;
-            padding: 30px 20px;
-            text-align: center;
+            color: #202124;
         }
 
-        .fake-logo {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 15px;
-            margin: 0 auto 20px;
+        .gmail-header {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid #e0e0e0;
+            gap: 12px;
+        }
+
+        .gmail-back {
+            font-size: 1.2em;
+            color: #5f6368;
+        }
+
+        .gmail-actions {
+            margin-left: auto;
+            display: flex;
+            gap: 15px;
+            color: #5f6368;
+        }
+
+        .gmail-subject-bar {
+            padding: 16px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .gmail-subject {
+            font-size: 1.2em;
+            font-weight: 400;
+            color: #202124;
+            margin-bottom: 4px;
+        }
+
+        .gmail-label {
+            display: inline-block;
+            background: #e8f0fe;
+            color: #1a73e8;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75em;
+        }
+
+        .gmail-sender {
+            display: flex;
+            padding: 16px;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .gmail-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5em;
+            font-weight: 600;
             color: #fff;
+            font-size: 1.1em;
+            flex-shrink: 0;
         }
 
-        .fake-login h3 {
-            margin-bottom: 20px;
-            color: #333;
+        .gmail-sender-info {
+            flex: 1;
         }
 
-        .fake-input {
-            width: 100%;
-            padding: 12px 15px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 1em;
-        }
-
-        .fake-btn {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-size: 1em;
-            cursor: pointer;
-        }
-
-        .url-bar {
-            background: #f5f5f5;
-            padding: 10px 15px;
+        .gmail-sender-name {
+            font-weight: 600;
+            color: #202124;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
-        .url-bar .lock {
-            color: #e94560;
+        .gmail-sender-email {
+            font-size: 0.8em;
+            color: #5f6368;
         }
 
-        .url-bar .url {
+        .gmail-time {
+            font-size: 0.75em;
+            color: #5f6368;
+        }
+
+        .gmail-body {
+            padding: 0 16px 16px 68px;
+            font-size: 0.95em;
+            line-height: 1.7;
+            color: #202124;
+        }
+
+        .gmail-body p {
+            margin-bottom: 16px;
+        }
+
+        .gmail-signature {
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid #e0e0e0;
             font-size: 0.85em;
+            color: #5f6368;
+        }
+
+        .gmail-signature strong {
+            color: #202124;
+        }
+
+        /* CJ Logistics Style */
+        .cj-container {
+            background: #fff;
             color: #333;
+        }
+
+        .cj-header {
+            background: linear-gradient(135deg, #d4380d, #ff4d4f);
+            padding: 20px 16px;
+            color: #fff;
+            text-align: center;
+        }
+
+        .cj-logo {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .cj-title {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .cj-tracking {
+            padding: 20px 16px;
+        }
+
+        .cj-tracking-number {
+            background: #f5f5f5;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .cj-tracking-label {
+            font-size: 0.8em;
+            color: #888;
+            margin-bottom: 4px;
+        }
+
+        .cj-tracking-value {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: #333;
+            letter-spacing: 1px;
+        }
+
+        .cj-status-timeline {
+            position: relative;
+            padding-left: 24px;
+        }
+
+        .cj-status-timeline::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            background: #e0e0e0;
+        }
+
+        .cj-status-item {
+            position: relative;
+            padding-bottom: 20px;
+        }
+
+        .cj-status-item::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e0e0e0;
+        }
+
+        .cj-status-item.active::before {
+            background: #d4380d;
+            box-shadow: 0 0 0 4px rgba(212, 56, 13, 0.2);
+        }
+
+        .cj-status-item.completed::before {
+            background: #52c41a;
+        }
+
+        .cj-status-text {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 2px;
+        }
+
+        .cj-status-time {
+            font-size: 0.8em;
+            color: #888;
+        }
+
+        .cj-info-box {
+            background: #fff7e6;
+            border: 1px solid #ffd591;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .cj-info-title {
+            color: #d4380d;
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cj-info-text {
+            font-size: 0.85em;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* iPhone Safari Style */
+        .safari-container {
+            background: #f2f2f7;
+        }
+
+        .safari-url-bar {
+            background: #fff;
+            margin: 8px;
+            border-radius: 10px;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85em;
+        }
+
+        .safari-lock {
+            color: #ff3b30;
+        }
+
+        .safari-lock.secure {
+            color: #34c759;
+        }
+
+        .safari-url {
+            color: #8e8e93;
             flex: 1;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
 
-        /* Message Simulation */
-        .message-sim {
-            background: #e5ddd5;
-            padding: 20px;
-            border-radius: 10px;
+        .safari-url .domain {
+            color: #000;
         }
 
-        .message-bubble {
-            max-width: 85%;
+        .safari-refresh {
+            color: #007aff;
+        }
+
+        .safari-content {
             background: #fff;
-            padding: 12px 15px;
-            border-radius: 15px;
-            margin-bottom: 10px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-        }
-
-        .message-bubble.received {
-            border-top-left-radius: 5px;
-        }
-
-        .message-sender {
-            font-size: 0.8em;
-            color: #128c7e;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .message-text {
-            color: #333;
-            line-height: 1.5;
-        }
-
-        .message-time {
-            text-align: right;
-            font-size: 0.75em;
-            color: #999;
-            margin-top: 5px;
-        }
-
-        /* App Install Simulation */
-        .app-install-sim {
-            background: #f5f5f5;
+            margin: 0 8px 8px;
             border-radius: 10px;
-            padding: 20px;
-            color: #333;
+            overflow: hidden;
         }
 
-        .app-header {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
+        /* Telegram Login */
+        .telegram-login {
+            padding: 40px 24px;
+            text-align: center;
         }
 
-        .app-icon {
+        .telegram-logo {
             width: 80px;
             height: 80px;
-            background: linear-gradient(135deg, #1a73e8, #4285f4);
-            border-radius: 20px;
+            background: linear-gradient(135deg, #2AABEE, #229ED9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2.5em;
+            color: #fff;
+        }
+
+        .telegram-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 8px;
+        }
+
+        .telegram-subtitle {
+            color: #8e8e93;
+            font-size: 0.9em;
+            margin-bottom: 30px;
+        }
+
+        .telegram-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            margin-bottom: 12px;
+            outline: none;
+            background: #f8f8f8;
+        }
+
+        .telegram-input:focus {
+            border-color: #2AABEE;
+            background: #fff;
+        }
+
+        .telegram-btn {
+            width: 100%;
+            padding: 14px;
+            background: #2AABEE;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .telegram-forgot {
+            color: #2AABEE;
+            font-size: 0.85em;
+            margin-top: 16px;
+            display: inline-block;
+        }
+
+        .telegram-warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 20px;
+            font-size: 0.8em;
+            color: #856404;
+            text-align: left;
+        }
+
+        /* Play Store Style */
+        .playstore-container {
+            background: #fff;
+            color: #202124;
+        }
+
+        .playstore-header {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            gap: 8px;
+        }
+
+        .playstore-back {
+            font-size: 1.2em;
+            color: #5f6368;
+        }
+
+        .playstore-search {
+            flex: 1;
+            background: #f1f3f4;
+            border-radius: 8px;
+            padding: 10px 16px;
+            color: #5f6368;
+            font-size: 0.9em;
+        }
+
+        .playstore-app {
+            padding: 16px;
+            display: flex;
+            gap: 16px;
+        }
+
+        .playstore-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 2em;
-            color: #fff;
+            flex-shrink: 0;
         }
 
-        .app-info h4 {
-            margin-bottom: 5px;
+        .playstore-info h2 {
+            font-size: 1.2em;
+            font-weight: 500;
+            margin-bottom: 4px;
         }
 
-        .app-info .developer {
-            color: #1a73e8;
-            font-size: 0.9em;
-        }
-
-        .app-info .rating {
-            color: #666;
+        .playstore-developer {
+            color: #01875f;
             font-size: 0.85em;
-            margin-top: 5px;
+            margin-bottom: 4px;
         }
 
-        .permissions {
-            background: #fff;
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 15px;
+        .playstore-meta {
+            display: flex;
+            gap: 16px;
+            color: #5f6368;
+            font-size: 0.75em;
+            margin-top: 8px;
         }
 
-        .permissions h5 {
-            color: #e94560;
-            margin-bottom: 10px;
-        }
-
-        .permission-item {
+        .playstore-meta span {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-            font-size: 0.9em;
+            gap: 4px;
         }
 
-        .permission-item:last-child {
+        .playstore-install-btn {
+            background: #01875f;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 0.9em;
+            font-weight: 600;
+            width: 100%;
+            margin: 16px;
+            width: calc(100% - 32px);
+        }
+
+        .playstore-permissions {
+            padding: 0 16px 16px;
+        }
+
+        .playstore-permissions-title {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #202124;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .playstore-permission-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .playstore-permission-item:last-child {
             border-bottom: none;
         }
 
-        .permission-icon {
-            color: #e94560;
+        .playstore-permission-icon {
+            width: 24px;
+            height: 24px;
+            color: #d93025;
+            font-size: 1.1em;
         }
 
-        /* Choices */
-        .choices {
-            margin-top: 30px;
+        .playstore-permission-text {
+            font-size: 0.85em;
+            color: #202124;
         }
 
-        .choices h3 {
-            margin-bottom: 20px;
-            color: #00d9ff;
+        .playstore-permission-desc {
+            font-size: 0.75em;
+            color: #5f6368;
+            margin-top: 2px;
         }
 
-        .choice-btn {
-            display: block;
-            width: 100%;
-            padding: 15px 20px;
-            margin-bottom: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            color: #fff;
-            font-size: 1em;
-            cursor: pointer;
-            text-align: left;
-            transition: all 0.3s ease;
+        /* KB Bank Style */
+        .kb-container {
+            background: #f5f5f5;
+            color: #333;
         }
 
-        .choice-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: #00d9ff;
-            transform: translateX(10px);
-        }
-
-        .choice-btn.correct {
-            background: rgba(74, 222, 128, 0.2);
-            border-color: #4ade80;
-        }
-
-        .choice-btn.wrong {
-            background: rgba(233, 69, 96, 0.2);
-            border-color: #e94560;
-        }
-
-        .choice-btn:disabled {
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        /* Result Screen */
-        .result-screen {
-            display: none;
+        .kb-header {
+            background: linear-gradient(135deg, #ffbc00, #ff9500);
+            padding: 20px 16px;
             text-align: center;
-            padding: 40px;
-            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .kb-logo {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .kb-title {
+            font-size: 0.85em;
+            color: #333;
+            opacity: 0.8;
+        }
+
+        .kb-alert {
+            background: #fff;
+            margin: 16px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .kb-alert-header {
+            background: #fee500;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .kb-alert-icon {
+            width: 40px;
+            height: 40px;
+            background: #ff4757;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.2em;
+        }
+
+        .kb-alert-title {
+            font-weight: 700;
+            color: #333;
+        }
+
+        .kb-alert-subtitle {
+            font-size: 0.8em;
+            color: #666;
+        }
+
+        .kb-alert-body {
+            padding: 20px;
+        }
+
+        .kb-transaction {
+            background: #f8f8f8;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .kb-transaction-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #e0e0e0;
+            font-size: 0.9em;
+        }
+
+        .kb-transaction-row:last-child {
+            border-bottom: none;
+        }
+
+        .kb-transaction-label {
+            color: #888;
+        }
+
+        .kb-transaction-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .kb-transaction-value.danger {
+            color: #ff4757;
+        }
+
+        .kb-message {
+            font-size: 0.85em;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .kb-btn {
+            width: 100%;
+            padding: 14px;
+            background: #ffbc00;
+            color: #333;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 700;
+        }
+
+        /* QR Code Container */
+        .qr-section {
+            text-align: center;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 12px;
+            margin: 16px;
+        }
+
+        .qr-code {
+            display: inline-block;
+            padding: 12px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .qr-code canvas, .qr-code img {
+            display: block;
+        }
+
+        .qr-instruction {
+            margin-top: 12px;
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        /* Simulation Screen */
+        .sim-screen {
+            display: none;
+            padding: 20px;
+        }
+
+        .sim-screen.active {
+            display: block;
+        }
+
+        .sim-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .sim-progress {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .sim-progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .sim-progress-dot.active {
+            background: var(--primary-red);
+        }
+
+        .sim-progress-dot.completed {
+            background: #4ade80;
+        }
+
+        .sim-type-badge {
+            display: inline-block;
+            background: rgba(233, 69, 96, 0.2);
+            color: var(--primary-red);
+            padding: 6px 16px;
             border-radius: 20px;
-            backdrop-filter: blur(10px);
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .sim-instruction {
+            background: rgba(0, 217, 255, 0.1);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 20px 0;
+            font-size: 0.9em;
+            color: var(--primary-blue);
+            text-align: center;
+        }
+
+        /* Result Modal */
+        .result-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .result-modal.active {
+            display: block;
+        }
+
+        .result-content {
+            max-width: 420px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .result-header {
+            text-align: center;
+            padding: 40px 0;
         }
 
         .result-icon {
-            font-size: 5em;
-            margin-bottom: 20px;
+            font-size: 4em;
+            margin-bottom: 16px;
         }
 
         .result-title {
-            font-size: 2em;
-            margin-bottom: 10px;
-        }
-
-        .result-title.success {
-            color: #4ade80;
-        }
-
-        .result-title.warning {
-            color: #fbbf24;
+            font-size: 1.5em;
+            margin-bottom: 8px;
         }
 
         .result-title.danger {
-            color: #e94560;
+            color: var(--primary-red);
         }
 
-        .result-stats {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin: 30px 0;
-        }
-
-        .result-stat {
-            text-align: center;
-        }
-
-        .result-stat .value {
-            font-size: 2.5em;
-            font-weight: bold;
-        }
-
-        .result-stat .label {
-            color: #a0a0a0;
-        }
-
-        /* Feedback Panel */
-        .feedback-panel {
-            display: none;
-            margin-top: 20px;
-            padding: 20px;
-            border-radius: 15px;
-            animation: slideIn 0.5s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .feedback-panel.correct {
-            background: rgba(74, 222, 128, 0.2);
-            border: 1px solid #4ade80;
-        }
-
-        .feedback-panel.wrong {
-            background: rgba(233, 69, 96, 0.2);
-            border: 1px solid #e94560;
-        }
-
-        .feedback-panel h4 {
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .feedback-panel.correct h4 {
+        .result-title.safe {
             color: #4ade80;
         }
 
-        .feedback-panel.wrong h4 {
-            color: #e94560;
+        .result-subtitle {
+            color: #888;
+            font-size: 0.95em;
         }
 
-        .feedback-panel p {
-            line-height: 1.8;
-            color: #ddd;
+        .result-section {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
-        .feedback-panel .tips {
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .feedback-panel .tips h5 {
-            color: #00d9ff;
-            margin-bottom: 10px;
-        }
-
-        .feedback-panel .tips ul {
-            list-style: none;
-            padding-left: 0;
-        }
-
-        .feedback-panel .tips li {
-            padding: 5px 0;
-            padding-left: 20px;
-            position: relative;
-        }
-
-        .feedback-panel .tips li::before {
-            content: '✓';
-            position: absolute;
-            left: 0;
-            color: #00d9ff;
-        }
-
-        .next-btn {
-            margin-top: 20px;
-        }
-
-        /* Guide Screen */
-        .guide-screen {
-            display: none;
-        }
-
-        .guide-section {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-            backdrop-filter: blur(10px);
-        }
-
-        .guide-section h3 {
-            color: #e94560;
-            margin-bottom: 15px;
+        .result-section h3 {
+            font-size: 0.9em;
+            color: var(--primary-red);
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
-        .guide-section ul {
+        .result-section h3.safe {
+            color: #4ade80;
+        }
+
+        .result-section p {
+            font-size: 0.9em;
+            color: #ccc;
+            line-height: 1.7;
+        }
+
+        .result-section ul {
             list-style: none;
             padding: 0;
         }
 
-        .guide-section li {
-            padding: 10px 0;
-            padding-left: 25px;
+        .result-section li {
+            padding: 8px 0;
+            padding-left: 24px;
             position: relative;
+            font-size: 0.9em;
+            color: #ccc;
             line-height: 1.6;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .guide-section li:last-child {
-            border-bottom: none;
-        }
-
-        .guide-section li::before {
+        .result-section li::before {
             content: '•';
             position: absolute;
-            left: 5px;
-            color: #00d9ff;
-            font-weight: bold;
+            left: 8px;
+            color: var(--primary-blue);
         }
 
-        .highlight {
-            background: rgba(233, 69, 96, 0.3);
+        .result-actions {
+            padding: 20px 0;
+        }
+
+        /* Hide screens */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Highlight suspicious */
+        .suspicious {
+            background: rgba(233, 69, 96, 0.2);
+            color: #ff6b6b;
             padding: 2px 6px;
-            border-radius: 3px;
+            border-radius: 4px;
+            font-weight: 500;
         }
 
-        /* Progress Bar */
-        .progress-container {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            height: 10px;
-            margin-bottom: 20px;
-            overflow: hidden;
+        /* Loading Animation */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
         }
 
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #e94560, #00d9ff);
-            border-radius: 10px;
-            transition: width 0.5s ease;
+        .loading-overlay.active {
+            display: flex;
         }
 
-        /* Responsive */
-        @media (max-width: 600px) {
-            .header h1 {
-                font-size: 1.8em;
-            }
-
-            .score-board {
-                flex-wrap: wrap;
-                gap: 20px;
-            }
-
-            .phone-sim {
-                max-width: 100%;
-            }
-
-            .result-stats {
-                flex-direction: column;
-                gap: 20px;
-            }
+        .loading-content {
+            text-align: center;
         }
 
-        /* Animations */
-        .shake {
-            animation: shake 0.5s ease;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
-        }
-
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        /* Indicators */
-        .indicator {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: var(--primary-red);
             border-radius: 50%;
-            margin-right: 8px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
         }
 
-        .indicator.red { background: #e94560; }
-        .indicator.green { background: #4ade80; }
-        .indicator.yellow { background: #fbbf24; }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .scan-instruction {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            margin-top: 20px;
+            border: 2px dashed rgba(255,255,255,0.1);
+        }
+
+        .scan-instruction h3 {
+            color: #fff;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+
+        .scan-instruction p {
+            color: #888;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: transparent;
+            color: #888;
+            font-size: 0.85em;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: var(--primary-red);
+            color: #fff;
+        }
+
+        /* Scenario Cards */
+        .scenario-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .scenario-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .scenario-card:hover {
+            border-color: var(--primary-red);
+            transform: translateY(-2px);
+        }
+
+        .scenario-card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .scenario-card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+        }
+
+        .scenario-card-title {
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+
+        .scenario-card-desc {
+            font-size: 0.8em;
+            color: #888;
+        }
+
+        .scenario-card-badge {
+            margin-left: auto;
+            font-size: 0.7em;
+            padding: 4px 8px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.1);
+            color: #888;
+        }
+
+        .scenario-card-badge.danger {
+            background: rgba(233, 69, 96, 0.2);
+            color: var(--primary-red);
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <h1>🛡️ SecuQuest</h1>
-            <p>큐싱(Quishing) 피싱 인식 훈련 시뮬레이션</p>
+    <div class="app-container" id="appContainer">
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-content">
+                <div class="loading-spinner"></div>
+                <p style="color: #fff;">QR코드 분석 중...</p>
+            </div>
+        </div>
+
+        <!-- Main Header -->
+        <header class="main-header">
+            <h1>SecuQuest</h1>
+            <p>큐싱(Quishing) 피싱 인식 훈련</p>
         </header>
-
-        <!-- Score Board -->
-        <div class="score-board" id="scoreBoard" style="display: none;">
-            <div class="score-item">
-                <div class="label">현재 점수</div>
-                <div class="value" id="currentScore">0</div>
-            </div>
-            <div class="score-item">
-                <div class="label">정답</div>
-                <div class="value success" id="correctCount">0</div>
-            </div>
-            <div class="score-item">
-                <div class="label">오답</div>
-                <div class="value danger" id="wrongCount">0</div>
-            </div>
-            <div class="score-item">
-                <div class="label">진행률</div>
-                <div class="value" id="progressText">1/5</div>
-            </div>
-        </div>
-
-        <!-- Progress Bar -->
-        <div class="progress-container" id="progressContainer" style="display: none;">
-            <div class="progress-bar" id="progressBar" style="width: 0%"></div>
-        </div>
 
         <!-- Start Screen -->
         <div class="start-screen" id="startScreen">
-            <h2>🎮 피싱 공격 시뮬레이션 체험</h2>
-            <p>
-                최근 정부기관, 싱크탱크 직원 등을 사칭해 QR코드 촬영을 유도하여<br>
-                악성앱 설치 및 인증정보 탈취를 목적으로 한 <strong>'큐싱(Quishing)'</strong> 공격이 증가하고 있습니다.<br><br>
-                이 시뮬레이션을 통해 실제 피싱 공격 시나리오를 체험하고,<br>
-                올바른 대응 방법을 학습해보세요.
-            </p>
-
-            <div class="warning-box">
-                <h3>⚠️ 교육 목적 시뮬레이션</h3>
-                <p>본 게임에 등장하는 모든 이메일, 메시지, QR코드, 앱 등은<br>
-                <strong>교육 목적으로 제작된 가상의 시나리오</strong>입니다.<br>
-                실제 피싱 공격이 아니며, 어떠한 개인정보도 수집하지 않습니다.</p>
-            </div>
-
-            <button class="btn btn-primary" onclick="startGame()">🚀 시뮬레이션 시작</button>
-            <button class="btn btn-secondary" onclick="showGuide()">📖 대응 가이드 보기</button>
-        </div>
-
-        <!-- Game Screen -->
-        <div class="game-screen" id="gameScreen"></div>
-
-        <!-- Result Screen -->
-        <div class="result-screen" id="resultScreen">
-            <div class="result-icon" id="resultIcon">🏆</div>
-            <h2 class="result-title" id="resultTitle">훈련 완료!</h2>
-            <p id="resultMessage">피싱 인식 능력을 평가했습니다.</p>
-
-            <div class="result-stats">
-                <div class="result-stat">
-                    <div class="value success" id="finalCorrect">0</div>
-                    <div class="label">정답</div>
-                </div>
-                <div class="result-stat">
-                    <div class="value danger" id="finalWrong">0</div>
-                    <div class="label">오답</div>
-                </div>
-                <div class="result-stat">
-                    <div class="value" id="finalScore">0</div>
-                    <div class="label">최종 점수</div>
-                </div>
-            </div>
-
-            <div id="resultAdvice" style="text-align: left; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 10px; margin: 20px 0;"></div>
-
-            <button class="btn btn-primary" onclick="restartGame()">🔄 다시 도전하기</button>
-            <button class="btn btn-secondary" onclick="showGuide()">📖 대응 가이드 보기</button>
-        </div>
-
-        <!-- Guide Screen -->
-        <div class="guide-screen" id="guideScreen">
-            <div class="guide-section">
-                <h3>🚨 큐싱(Quishing)이란?</h3>
-                <p style="padding: 10px 0; line-height: 1.8;">
-                    QR코드에 <span class="highlight">악성앱 다운로드·설치 주소(URL)</span> 또는
-                    <span class="highlight">피싱사이트 접속주소(URL)</span>를 포함해
-                    QR코드를 게재 또는 온라인 유포하여 개인정보 등 민감정보 및 금전탈취를 유도하는 공격 기법입니다.
+            <div class="hero-section">
+                <div class="hero-icon">🛡️</div>
+                <h2 class="hero-title">실전 큐싱 공격 체험</h2>
+                <p class="hero-desc">
+                    실제 피싱 공격과 동일한 시나리오를 체험하고<br>
+                    안전하게 대응하는 방법을 학습하세요.
                 </p>
             </div>
 
-            <div class="guide-section">
-                <h3>🔍 주요 공격 유형</h3>
-                <ul>
-                    <li>국내외 <strong>싱크탱크 직원을 사칭</strong>, 국내외 정세변화에 대한 자문 및 설문을 이유로 QR코드 촬영 유도</li>
-                    <li>외교 관련 <strong>정부기관 직원을 사칭</strong>, 민감정보 접근권한 제공 수단으로 QR코드 촬영 유도</li>
-                    <li>스마트폰 권한을 탈취하는 <strong>악성앱 설치</strong> 유도</li>
-                    <li>정상사이트와 유사하게 제작된 <strong>피싱 SNS플랫폼 로그인 페이지</strong>로 유인</li>
+            <div class="scenario-preview">
+                <h3>📱 체험 가능한 시나리오</h3>
+                <ul class="scenario-list">
+                    <li>
+                        <span class="scenario-icon" style="background: linear-gradient(135deg, #ea4335, #fbbc05);">📧</span>
+                        <span>싱크탱크 자문 요청 이메일</span>
+                    </li>
+                    <li>
+                        <span class="scenario-icon" style="background: linear-gradient(135deg, #d4380d, #ff4d4f);">📦</span>
+                        <span>택배 배송 현황 알림</span>
+                    </li>
+                    <li>
+                        <span class="scenario-icon" style="background: linear-gradient(135deg, #2AABEE, #229ED9);">💬</span>
+                        <span>Telegram 보안 로그인</span>
+                    </li>
+                    <li>
+                        <span class="scenario-icon" style="background: linear-gradient(135deg, #01875f, #34a853);">📲</span>
+                        <span>정부24 보안인증 앱 설치</span>
+                    </li>
+                    <li>
+                        <span class="scenario-icon" style="background: linear-gradient(135deg, #ffbc00, #ff9500);">🏦</span>
+                        <span>KB국민은행 이상거래 알림</span>
+                    </li>
                 </ul>
             </div>
 
-            <div class="guide-section">
-                <h3>🛡️ 예방 수칙</h3>
-                <ul>
-                    <li>출처가 불분명한 발신자로부터의 메일, 메시지 등으로부터 생성된 <strong>QR코드는 촬영하지 말 것</strong></li>
-                    <li>의심되는 사이트 주소의 경우 <strong>정상 사이트와의 일치여부를 확인</strong></li>
-                    <li>개인정보는 <strong>신뢰된 사이트에만 입력</strong></li>
-                    <li>정부기관 및 금융회사는 <strong>원격제어앱 설치를 요구하지 않음</strong></li>
-                    <li><strong>"번호도용문자차단서비스"</strong>를 신청하여 번호 도용 차단</li>
-                </ul>
+            <button class="btn btn-primary" onclick="startSimulation()">🚀 시뮬레이션 시작</button>
+            <button class="btn btn-secondary" onclick="showGuide()">📖 대응 가이드</button>
+        </div>
+
+        <!-- Simulation Screen -->
+        <div class="sim-screen" id="simScreen">
+            <!-- Dynamic content will be loaded here -->
+        </div>
+
+        <!-- Result Modal -->
+        <div class="result-modal" id="resultModal">
+            <div class="result-content" id="resultContent">
+                <!-- Dynamic result content -->
+            </div>
+        </div>
+
+        <!-- Guide Screen -->
+        <div class="sim-screen" id="guideScreen">
+            <div class="tab-nav">
+                <button class="tab-btn active" onclick="switchGuideTab('what')">큐싱이란?</button>
+                <button class="tab-btn" onclick="switchGuideTab('prevent')">예방수칙</button>
+                <button class="tab-btn" onclick="switchGuideTab('response')">대응방법</button>
             </div>
 
-            <div class="guide-section">
-                <h3>🆘 피해 발생 시 대응</h3>
-                <ul>
-                    <li>모바일 백신으로 <strong>악성 앱 삭제</strong></li>
-                    <li><strong>공인인증서 폐기 및 재발급</strong></li>
-                    <li>통신사 고객센터를 통해 <strong>모바일 결제 내역 확인</strong></li>
-                    <li>피해가 확인되면 <strong>관할 경찰서 사이버수사대</strong>에 신고</li>
-                    <li>주변 지인에게 피해 사실을 알려 <strong>2차 피해 예방</strong></li>
-                </ul>
+            <div id="guideContent">
+                <!-- Dynamic guide content -->
             </div>
 
-            <div class="guide-section">
-                <h3>📞 신고 및 확인 방법</h3>
-                <ul>
-                    <li><strong>한국인터넷진흥원 사이버민원센터</strong>: 국번없이 118</li>
-                    <li><strong>보호나라(카카오톡 채널)</strong>: '큐싱 확인서비스', '스미싱 확인서비스'</li>
-                    <li><strong>보이스피싱통합신고대응센터</strong>: '스미싱 문자메세지 차단 신고하기'</li>
-                </ul>
-            </div>
-
-            <div style="text-align: center; margin-top: 30px;">
-                <button class="btn btn-primary" onclick="backToStart()">🏠 메인으로 돌아가기</button>
+            <div style="padding: 20px 0;">
+                <button class="btn btn-primary" onclick="backToStart()">🏠 메인으로</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Game State
+        // ============================================
+        // Configuration & State
+        // ============================================
+        const BASE_URL = window.location.origin + window.location.pathname;
+
         let currentScenario = 0;
         let score = 0;
-        let correctAnswers = 0;
-        let wrongAnswers = 0;
+        let results = [];
 
-        // Scenarios
+        // ============================================
+        // Scenarios Data
+        // ============================================
         const scenarios = [
             {
-                type: "이메일 - 싱크탱크 사칭",
-                content: `
-                    <div class="email-sim">
-                        <div class="email-header">
-                            <div class="email-from"><span>보낸사람:</span> <strong>김정우 연구위원</strong> &lt;<span class="suspicious">research_kjw@k0rea-institute.org</span>&gt;</div>
-                            <div class="email-to"><span>받는사람:</span> 나</div>
-                            <div class="email-subject"><span>제목:</span> [긴급] 한반도 정세 분석 자문 요청 - 설문 참여 부탁드립니다</div>
-                        </div>
-                        <div class="email-body">
-                            <p>안녕하세요, 선생님.</p>
-                            <p>저는 <strong>한국정책연구원</strong> 외교안보센터 김정우 연구위원입니다.</p>
-                            <p>현재 저희 연구원에서는 최근 한반도 정세 변화에 대한 전문가 의견을 수렴하고 있으며,
-                            선생님의 고견을 듣고자 연락드립니다.</p>
-                            <p>아래 QR코드를 스마트폰으로 촬영하시면 <strong>비공개 설문 페이지</strong>로 연결됩니다.
-                            보안 유지를 위해 QR코드를 통해서만 접속이 가능합니다.</p>
-                            <div class="qr-container">
-                                <div class="fake-qr"></div>
-                                <p class="qr-label">📱 스마트폰으로 QR코드를 촬영해주세요</p>
-                            </div>
-                            <p>설문은 약 5분 정도 소요되며, 참여해주신 분께는 소정의 사례비를 지급해 드립니다.</p>
-                            <p>감사합니다.<br><br>
-                            김정우 드림<br>
-                            한국정책연구원 외교안보센터<br>
-                            Tel: 02-1234-5678</p>
-                        </div>
-                    </div>
-                `,
-                question: "이 이메일을 받았을 때 어떻게 대응하시겠습니까?",
-                choices: [
-                    { text: "QR코드를 촬영하여 설문에 참여한다", correct: false },
-                    { text: "발신자 이메일 주소가 의심스러우므로 QR코드를 촬영하지 않고, 해당 기관에 직접 확인 전화를 한다", correct: true },
-                    { text: "사례비에 관심이 있으므로 일단 QR코드를 촬영해본다", correct: false },
-                    { text: "이메일에 답장하여 더 자세한 정보를 요청한다", correct: false }
-                ],
-                correctFeedback: "정답입니다! 발신자 이메일 주소를 자세히 보면 'k0rea'(숫자 0 사용)처럼 정상 도메인과 유사하지만 다른 주소를 사용하고 있습니다. QR코드를 촬영하기 전에 항상 발신자의 신원을 직접 확인해야 합니다.",
-                wrongFeedback: "위험한 선택입니다! 이 이메일은 피싱 공격입니다. 발신자 이메일 주소를 자세히 보면 'k0rea'(숫자 0 사용)처럼 정상 도메인을 교묘하게 위장하고 있습니다. 출처가 불분명한 QR코드는 절대 촬영하지 마세요.",
-                tips: [
-                    "발신자 이메일 주소를 꼼꼼히 확인하세요 (숫자와 문자 교체, 오타 등)",
-                    "기관을 사칭하는 경우 해당 기관에 직접 전화로 확인하세요",
-                    "QR코드를 통해서만 접속 가능하다는 것은 의심 신호입니다",
-                    "사례비나 보상을 미끼로 사용하는 경우 더욱 주의하세요"
-                ]
+                id: 'thinktank',
+                type: '싱크탱크 사칭 이메일',
+                icon: '📧',
+                iconBg: 'linear-gradient(135deg, #ea4335, #fbbc05)',
+                danger: true,
+                renderPhone: renderGmailScenario,
+                result: {
+                    title: '악의적 큐싱 공격!',
+                    icon: '🚨',
+                    isDanger: true,
+                    whatHappened: [
+                        '발신자 이메일 주소가 <span class="suspicious">k0rea-institute.org</span>로, "Korea"를 "K0rea"(숫자 0)로 위장한 가짜 도메인입니다.',
+                        '자문료 30만원이라는 금전적 유혹으로 QR코드 촬영을 유도합니다.',
+                        'QR코드 촬영 시 악성앱 설치 또는 피싱 사이트로 연결됩니다.'
+                    ],
+                    consequences: [
+                        '스마트폰에 악성앱이 설치되어 개인정보(연락처, 사진, 문자) 탈취',
+                        '피싱 사이트에서 입력한 계정정보 유출',
+                        '탈취된 정보를 이용한 2차 피싱 공격 발생',
+                        '소속 기관의 IT인프라 침투 시도'
+                    ],
+                    prevention: [
+                        '발신자 이메일 주소의 도메인을 꼼꼼히 확인하세요',
+                        '비정상적인 금전 제안은 피싱의 신호입니다',
+                        '출처가 불분명한 QR코드는 절대 촬영하지 마세요',
+                        '해당 기관에 직접 전화로 확인하세요'
+                    ]
+                }
             },
             {
-                type: "메시지 - 정부기관 사칭",
-                content: `
-                    <div class="message-sim">
-                        <div class="message-bubble received">
-                            <div class="message-sender">+82-10-8472-3156</div>
-                            <div class="message-text">
-                                [외교부 긴급공지]<br><br>
-                                안녕하세요, 외교부 사이버안보과입니다.<br><br>
-                                귀하의 여권정보가 해외에서 도용된 정황이 확인되어 긴급히 연락드립니다.<br><br>
-                                본인확인 및 피해방지를 위해 아래 QR코드를 촬영하여 본인인증을 완료해주시기 바랍니다.<br><br>
-                                ※ 24시간 내 미완료 시 여권이 자동 정지됩니다.
-                            </div>
-                            <div class="message-time">오전 9:32</div>
-                        </div>
-                        <div class="qr-container" style="background: #fff; margin: 10px 0;">
-                            <div class="fake-qr"></div>
-                            <p class="qr-label" style="color: #666;">본인인증 QR코드</p>
-                        </div>
-                    </div>
-                `,
-                question: "이 문자 메시지를 받았을 때 어떻게 대응하시겠습니까?",
-                choices: [
-                    { text: "여권이 정지되면 안되므로 빨리 QR코드를 촬영한다", correct: false },
-                    { text: "정부기관은 문자로 QR코드를 보내지 않으므로 무시하고, 정부24 또는 외교부 대표번호로 직접 확인한다", correct: true },
-                    { text: "발신번호로 전화를 걸어 확인한다", correct: false },
-                    { text: "일단 QR코드를 촬영해서 어떤 사이트인지 확인해본다", correct: false }
-                ],
-                correctFeedback: "정답입니다! 정부기관은 문자 메시지로 QR코드를 보내 본인인증을 요구하지 않습니다. '24시간 내 정지' 같은 긴박함을 조성하는 것은 전형적인 피싱 수법입니다.",
-                wrongFeedback: "위험한 선택입니다! 정부기관은 절대로 문자 메시지로 QR코드를 보내 본인인증을 요구하지 않습니다. '24시간 내 정지'처럼 급박함을 조성하는 것은 피싱의 대표적인 수법입니다.",
-                tips: [
-                    "정부기관은 문자로 QR코드를 보내지 않습니다",
-                    "긴박함을 조성하는 메시지는 피싱일 가능성이 높습니다",
-                    "발신번호로 회신 전화하지 마세요 - 공격자의 번호일 수 있습니다",
-                    "정부24(www.gov.kr) 또는 대표번호로 직접 확인하세요"
-                ]
+                id: 'delivery',
+                type: '택배 배송 사칭',
+                icon: '📦',
+                iconBg: 'linear-gradient(135deg, #d4380d, #ff4d4f)',
+                danger: true,
+                renderPhone: renderDeliveryScenario,
+                result: {
+                    title: '악의적 큐싱 공격!',
+                    icon: '🚨',
+                    isDanger: true,
+                    whatHappened: [
+                        '실제 CJ대한통운 화면과 유사하게 제작된 피싱 페이지입니다.',
+                        '"관세 미납"이라는 거짓 정보로 긴급함을 조성합니다.',
+                        'QR코드 촬영 시 결제 정보 입력을 요구하는 피싱 사이트로 연결됩니다.'
+                    ],
+                    consequences: [
+                        '입력한 카드번호, 비밀번호 등 결제정보 탈취',
+                        '모바일 소액결제 피해 발생',
+                        '개인정보를 이용한 추가 금융사기',
+                        '동일 수법의 스미싱 문자 재발송'
+                    ],
+                    prevention: [
+                        '택배사는 관세 납부를 위해 QR코드를 발송하지 않습니다',
+                        '실제 배송조회는 공식 앱이나 웹사이트에서 확인하세요',
+                        '긴박함을 조성하는 메시지는 피싱일 가능성이 높습니다',
+                        '118(KISA)에 스미싱 여부를 확인하세요'
+                    ]
+                }
             },
             {
-                type: "피싱 사이트 - SNS 로그인 유도",
-                content: `
-                    <div class="phone-sim">
-                        <div class="phone-screen">
-                            <div class="phone-status-bar">
-                                <span>09:41</span>
-                                <span>📶 100%</span>
-                            </div>
-                            <div class="url-bar">
-                                <span class="lock">🔓</span>
-                                <span class="url">telegram-verify.com/login</span>
-                            </div>
-                            <div class="fake-login">
-                                <div class="fake-login-box">
-                                    <div class="fake-logo">✈️</div>
-                                    <h3>Telegram</h3>
-                                    <p style="color: #666; font-size: 0.9em; margin-bottom: 20px;">보안 확인을 위해<br>다시 로그인해주세요</p>
-                                    <input type="text" class="fake-input" placeholder="전화번호 또는 사용자명" disabled>
-                                    <input type="password" class="fake-input" placeholder="비밀번호" disabled>
-                                    <button class="fake-btn">로그인</button>
-                                    <p style="color: #999; font-size: 0.8em; margin-top: 15px;">계정이 없으신가요? 회원가입</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `,
-                question: "QR코드를 촬영했더니 위와 같은 화면이 나타났습니다. 어떻게 하시겠습니까?",
-                choices: [
-                    { text: "평소 사용하는 계정 정보를 입력하여 로그인한다", correct: false },
-                    { text: "URL이 공식 사이트(telegram.org)가 아니고 보안 연결(🔒)도 아니므로 즉시 브라우저를 닫는다", correct: true },
-                    { text: "비밀번호만 다른 것으로 입력해서 테스트해본다", correct: false },
-                    { text: "회원가입을 눌러 새 계정을 만든다", correct: false }
-                ],
-                correctFeedback: "정답입니다! URL이 'telegram-verify.com'으로 공식 도메인(telegram.org)이 아니며, 보안 연결(🔒)이 아닌 🔓 표시가 되어 있습니다. 이런 피싱 사이트에서는 절대 정보를 입력하면 안 됩니다.",
-                wrongFeedback: "위험한 선택입니다! 이 페이지는 피싱 사이트입니다. URL이 'telegram-verify.com'으로 공식 텔레그램 도메인(telegram.org)이 아닙니다. 또한 보안 연결(🔒)이 아닌 🔓 표시가 되어 있어 안전하지 않은 연결입니다.",
-                tips: [
-                    "URL을 항상 확인하세요 - 공식 도메인인지 확인",
-                    "보안 연결(🔒 HTTPS)인지 확인하세요",
-                    "피싱 사이트에서 테스트 입력도 위험합니다",
-                    "의심스러우면 직접 앱이나 공식 사이트를 통해 접속하세요"
-                ]
+                id: 'telegram',
+                type: 'SNS 로그인 피싱',
+                icon: '💬',
+                iconBg: 'linear-gradient(135deg, #2AABEE, #229ED9)',
+                danger: true,
+                renderPhone: renderTelegramScenario,
+                result: {
+                    title: '악의적 큐싱 공격!',
+                    icon: '🚨',
+                    isDanger: true,
+                    whatHappened: [
+                        'URL이 <span class="suspicious">telegram-secure.net</span>으로 공식 도메인(telegram.org)이 아닙니다.',
+                        '보안 연결(🔒)이 아닌 비보안(🔓) 표시가 있습니다.',
+                        '실제 텔레그램 로그인 페이지와 동일하게 위장한 피싱 사이트입니다.'
+                    ],
+                    consequences: [
+                        '텔레그램 계정 탈취 및 무단 접근',
+                        '대화 내용, 파일, 연락처 전체 유출',
+                        '탈취된 계정으로 지인에게 금전 요구 사기',
+                        '계정과 연동된 다른 서비스까지 피해 확산'
+                    ],
+                    prevention: [
+                        'URL을 항상 확인하고 공식 도메인인지 검증하세요',
+                        '보안 연결(🔒 HTTPS)인지 확인하세요',
+                        'QR코드로 연결된 로그인 페이지는 의심하세요',
+                        '공식 앱을 통해서만 로그인하세요'
+                    ]
+                }
             },
             {
-                type: "악성앱 설치 유도",
-                content: `
-                    <div class="phone-sim">
-                        <div class="phone-screen">
-                            <div class="phone-status-bar">
-                                <span>09:41</span>
-                                <span>📶 100%</span>
-                            </div>
-                            <div class="phone-content">
-                                <div class="app-install-sim">
-                                    <div class="app-header">
-                                        <div class="app-icon">🏛️</div>
-                                        <div class="app-info">
-                                            <h4>정부24 보안인증</h4>
-                                            <div class="developer" style="color: #e94560;">gov-security-app.com</div>
-                                            <div class="rating">⭐ 4.8 (1,234 리뷰)</div>
-                                        </div>
-                                    </div>
-                                    <button class="fake-btn" style="background: #4ade80;">설치</button>
-
-                                    <div class="permissions">
-                                        <h5>⚠️ 이 앱에서 요청하는 권한:</h5>
-                                        <div class="permission-item">
-                                            <span class="permission-icon">📱</span>
-                                            <span>기기 정보 (IMEI, 전화번호)</span>
-                                        </div>
-                                        <div class="permission-item">
-                                            <span class="permission-icon">📷</span>
-                                            <span>카메라 및 마이크 접근</span>
-                                        </div>
-                                        <div class="permission-item">
-                                            <span class="permission-icon">📂</span>
-                                            <span>모든 파일 접근</span>
-                                        </div>
-                                        <div class="permission-item">
-                                            <span class="permission-icon">💬</span>
-                                            <span>SMS 메시지 읽기 및 전송</span>
-                                        </div>
-                                        <div class="permission-item">
-                                            <span class="permission-icon">📍</span>
-                                            <span>위치 정보 항상 접근</span>
-                                        </div>
-                                        <div class="permission-item">
-                                            <span class="permission-icon">📇</span>
-                                            <span>연락처 전체 접근</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `,
-                question: "QR코드를 촬영했더니 앱 설치 화면이 나타났습니다. 어떻게 하시겠습니까?",
-                choices: [
-                    { text: "정부24 앱이니까 신뢰할 수 있으므로 설치한다", correct: false },
-                    { text: "공식 스토어(Play Store/App Store)가 아니고 과도한 권한을 요청하므로 설치하지 않고 즉시 화면을 닫는다", correct: true },
-                    { text: "일단 설치하고 나중에 삭제하면 된다", correct: false },
-                    { text: "권한은 나중에 거부하면 되니까 설치한다", correct: false }
-                ],
-                correctFeedback: "정답입니다! 이 앱은 악성앱입니다. 공식 앱스토어가 아닌 외부 링크(gov-security-app.com)에서 배포되며, SMS 읽기/전송, 연락처 접근 등 과도한 권한을 요청합니다. 정부 앱은 반드시 공식 스토어에서만 다운로드하세요.",
-                wrongFeedback: "위험한 선택입니다! 이 앱은 악성앱입니다. 공식 앱스토어(Play Store/App Store)가 아닌 외부 사이트에서 배포되며, SMS, 연락처, 위치정보 등 과도한 권한을 요청합니다. 이런 앱을 설치하면 개인정보가 모두 유출됩니다.",
-                tips: [
-                    "앱은 반드시 공식 스토어(Play Store/App Store)에서만 다운로드하세요",
-                    "과도한 권한을 요청하는 앱은 의심하세요",
-                    "정부기관 앱은 외부 링크로 설치를 유도하지 않습니다",
-                    "악성앱은 설치만 해도 정보가 유출될 수 있습니다"
-                ]
+                id: 'malware',
+                type: '악성앱 설치 유도',
+                icon: '📲',
+                iconBg: 'linear-gradient(135deg, #01875f, #34a853)',
+                danger: true,
+                renderPhone: renderMalwareScenario,
+                result: {
+                    title: '악의적 큐싱 공격!',
+                    icon: '🚨',
+                    isDanger: true,
+                    whatHappened: [
+                        '공식 Play Store/App Store가 아닌 외부 사이트에서 앱 설치를 유도합니다.',
+                        '개발자가 <span class="suspicious">gov24-security.com</span>으로 정부 공식 개발자가 아닙니다.',
+                        'SMS, 연락처, 위치정보 등 과도한 권한을 요청합니다.'
+                    ],
+                    consequences: [
+                        '기기정보(IMEI, 전화번호) 수집 및 유출',
+                        '문자 메시지 탈취로 인증번호 가로채기',
+                        '연락처 수집 후 지인 대상 스미싱 발송',
+                        '카메라/마이크 원격 활성화로 도청/감시',
+                        '스마트폰 내 모든 파일 접근 및 유출'
+                    ],
+                    prevention: [
+                        '앱은 반드시 공식 스토어에서만 다운로드하세요',
+                        '과도한 권한을 요청하는 앱은 설치하지 마세요',
+                        '정부기관은 외부 링크로 앱 설치를 유도하지 않습니다',
+                        '의심스러운 앱 설치 시 즉시 삭제하세요'
+                    ]
+                }
             },
             {
-                type: "이메일 - 기업 IT인프라 접근 유도",
-                content: `
-                    <div class="email-sim">
-                        <div class="email-header">
-                            <div class="email-from"><span>보낸사람:</span> <strong>IT보안팀</strong> &lt;<span class="suspicious">security@company-helpdesk.net</span>&gt;</div>
-                            <div class="email-to"><span>받는사람:</span> 전 직원</div>
-                            <div class="email-subject"><span>제목:</span> [필수] 긴급 보안패치 적용 안내 - 오늘 중 완료 필수</div>
-                        </div>
-                        <div class="email-body">
-                            <p>안녕하세요, IT보안팀입니다.</p>
-                            <p>최근 발생한 <strong style="color: #e94560;">제로데이 취약점</strong>에 대응하기 위해
-                            긴급 보안패치를 배포합니다.</p>
-                            <p><strong>모든 직원은 오늘 업무 종료 전까지</strong> 아래 QR코드를 촬영하여
-                            보안패치를 설치해주시기 바랍니다.</p>
-                            <div class="qr-container">
-                                <div class="fake-qr"></div>
-                                <p class="qr-label">📱 스마트폰으로 QR코드를 촬영하여 보안패치 설치</p>
-                            </div>
-                            <p style="color: #e94560;"><strong>※ 주의: 미설치 시 내일부터 사내 시스템 접근이 차단됩니다.</strong></p>
-                            <p>보안패치 설치 후 사내 VPN에 재로그인 해주시기 바랍니다.</p>
-                            <p>문의: IT보안팀 (내선 1234)</p>
-                        </div>
-                    </div>
-                `,
-                question: "회사에서 이런 이메일을 받았습니다. 어떻게 대응하시겠습니까?",
-                choices: [
-                    { text: "시스템 접근이 차단되면 안되므로 빨리 QR코드를 촬영한다", correct: false },
-                    { text: "발신자 도메인이 회사 공식 도메인이 아니므로 QR코드를 촬영하지 않고, IT보안팀에 직접 전화로 확인한다", correct: true },
-                    { text: "동료들에게 먼저 전달하여 함께 설치한다", correct: false },
-                    { text: "답장을 보내 더 자세한 설명을 요청한다", correct: false }
-                ],
-                correctFeedback: "정답입니다! 발신자 이메일이 'company-helpdesk.net'으로 회사 공식 도메인이 아닙니다. 또한 QR코드로 보안패치를 배포하는 것은 일반적이지 않습니다. IT부서에 직접 확인하는 것이 올바른 대응입니다.",
-                wrongFeedback: "위험한 선택입니다! 이것은 기업을 대상으로 한 피싱 공격입니다. 발신자 도메인(company-helpdesk.net)이 회사 공식 도메인이 아니며, QR코드로 보안패치를 배포하는 것은 일반적이지 않습니다. 동료에게 전달하면 피해가 확산됩니다.",
-                tips: [
-                    "회사 내부 이메일인지 발신자 도메인을 확인하세요",
-                    "긴급함을 강조하며 빠른 행동을 유도하면 의심하세요",
-                    "IT부서 공지는 항상 공식 채널을 통해 확인하세요",
-                    "의심되는 이메일은 동료에게 전달하지 마세요"
-                ]
+                id: 'bank',
+                type: '금융기관 사칭',
+                icon: '🏦',
+                iconBg: 'linear-gradient(135deg, #ffbc00, #ff9500)',
+                danger: true,
+                renderPhone: renderBankScenario,
+                result: {
+                    title: '악의적 큐싱 공격!',
+                    icon: '🚨',
+                    isDanger: true,
+                    whatHappened: [
+                        'KB국민은행 공식 디자인을 모방한 피싱 페이지입니다.',
+                        '"해외 부정결제" 긴급 알림으로 불안감을 조성합니다.',
+                        'QR코드 촬영 시 금융정보 입력을 요구하는 피싱 사이트로 연결됩니다.'
+                    ],
+                    consequences: [
+                        '계좌번호, 비밀번호, 보안카드 정보 탈취',
+                        '공동인증서 유출로 금융거래 위험',
+                        '계좌에서 무단 이체 및 출금',
+                        '대출 사기, 명의도용 등 2차 금융범죄'
+                    ],
+                    prevention: [
+                        '은행은 문자나 이메일로 금융정보를 요구하지 않습니다',
+                        '이상거래 알림을 받으면 공식 앱이나 고객센터에서 확인하세요',
+                        '긴급함을 강조하는 금융 메시지는 피싱입니다',
+                        '피해 발생 시 즉시 은행 고객센터와 경찰에 신고하세요'
+                    ]
+                }
             }
         ];
 
-        // Functions
-        function startGame() {
+        // ============================================
+        // Render Functions for Each Scenario
+        // ============================================
+
+        function renderGmailScenario(qrId) {
+            return `
+                <div class="phone-mockup">
+                    <div class="phone-notch">
+                        <div class="phone-speaker"></div>
+                        <div class="phone-camera"></div>
+                    </div>
+                    <div class="phone-screen">
+                        <div class="phone-status-bar">
+                            <span>9:41</span>
+                            <div class="status-icons">
+                                <span>📶</span>
+                                <span>🔋</span>
+                            </div>
+                        </div>
+                        <div class="gmail-container">
+                            <div class="gmail-header">
+                                <span class="gmail-back">←</span>
+                                <div class="gmail-actions">
+                                    <span>📥</span>
+                                    <span>🗑️</span>
+                                    <span>📧</span>
+                                    <span>⋮</span>
+                                </div>
+                            </div>
+                            <div class="gmail-subject-bar">
+                                <div class="gmail-subject">[긴급] 한반도 정세 분석 자문 요청</div>
+                                <span class="gmail-label">받은편지함</span>
+                            </div>
+                            <div class="gmail-sender">
+                                <div class="gmail-avatar" style="background: #1a73e8;">김</div>
+                                <div class="gmail-sender-info">
+                                    <div class="gmail-sender-name">
+                                        김정우 연구위원
+                                        <span class="gmail-time">오전 9:32</span>
+                                    </div>
+                                    <div class="gmail-sender-email">
+                                        받는사람: 나 ▼<br>
+                                        <span class="suspicious">research_kjw@k0rea-institute.org</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="gmail-body">
+                                <p>안녕하세요, 선생님.</p>
+                                <p>저는 <strong>한국정책연구원</strong> 외교안보센터 김정우 연구위원입니다.</p>
+                                <p>현재 저희 연구원에서는 최근 <strong>한반도 정세 변화</strong>에 대한 전문가 의견을 수렴하고 있으며, 선생님의 고견을 듣고자 연락드립니다.</p>
+                                <p>아래 QR코드를 촬영하시면 비공개 설문 페이지로 연결됩니다. 보안 유지를 위해 QR코드를 통해서만 접속이 가능합니다.</p>
+
+                                <div class="qr-section">
+                                    <div class="qr-code" id="${qrId}"></div>
+                                    <p class="qr-instruction">📱 스마트폰으로 QR코드를 촬영해주세요</p>
+                                </div>
+
+                                <p>설문은 약 10분 정도 소요되며, 참여해주신 분께는 <strong style="color: #1a73e8;">자문료 30만원</strong>을 지급해 드립니다.</p>
+
+                                <div class="gmail-signature">
+                                    <strong>김정우</strong> 드림<br>
+                                    한국정책연구원 외교안보센터<br>
+                                    Tel: 02-2007-0114<br>
+                                    Email: research_kjw@k0rea-institute.org
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderDeliveryScenario(qrId) {
+            return `
+                <div class="phone-mockup">
+                    <div class="phone-notch">
+                        <div class="phone-speaker"></div>
+                        <div class="phone-camera"></div>
+                    </div>
+                    <div class="phone-screen">
+                        <div class="phone-status-bar">
+                            <span>10:23</span>
+                            <div class="status-icons">
+                                <span>📶</span>
+                                <span>🔋</span>
+                            </div>
+                        </div>
+                        <div class="cj-container">
+                            <div class="cj-header">
+                                <div class="cj-logo">CJ대한통운</div>
+                                <div class="cj-title">배송 현황 조회</div>
+                            </div>
+                            <div class="cj-tracking">
+                                <div class="cj-tracking-number">
+                                    <div class="cj-tracking-label">운송장번호</div>
+                                    <div class="cj-tracking-value">640 1234 5678</div>
+                                </div>
+
+                                <div class="cj-status-timeline">
+                                    <div class="cj-status-item completed">
+                                        <div class="cj-status-text">상품 인수</div>
+                                        <div class="cj-status-time">01/18 14:23 인천물류센터</div>
+                                    </div>
+                                    <div class="cj-status-item completed">
+                                        <div class="cj-status-text">배송 출발</div>
+                                        <div class="cj-status-time">01/19 06:15 서울강남Sub</div>
+                                    </div>
+                                    <div class="cj-status-item active">
+                                        <div class="cj-status-text" style="color: #d4380d;">⚠️ 통관 보류</div>
+                                        <div class="cj-status-time">01/19 09:42 인천세관</div>
+                                    </div>
+                                    <div class="cj-status-item">
+                                        <div class="cj-status-text" style="color: #888;">배송 완료</div>
+                                        <div class="cj-status-time">-</div>
+                                    </div>
+                                </div>
+
+                                <div class="cj-info-box">
+                                    <div class="cj-info-title">
+                                        ⚠️ 관세 납부 필요
+                                    </div>
+                                    <div class="cj-info-text">
+                                        해외 직구 상품의 관세 <strong>32,400원</strong>이 미납되어 배송이 보류되었습니다.<br><br>
+                                        아래 QR코드를 촬영하여 <strong>오늘 중으로</strong> 결제를 완료해주세요. 미납 시 상품이 반송됩니다.
+                                    </div>
+                                </div>
+
+                                <div class="qr-section" style="background: #fff;">
+                                    <div class="qr-code" id="${qrId}"></div>
+                                    <p class="qr-instruction" style="color: #d4380d;">📱 QR코드 촬영 후 관세 납부</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderTelegramScenario(qrId) {
+            return `
+                <div class="phone-mockup">
+                    <div class="phone-notch">
+                        <div class="phone-speaker"></div>
+                        <div class="phone-camera"></div>
+                    </div>
+                    <div class="phone-screen">
+                        <div class="phone-status-bar" style="background: #f2f2f7;">
+                            <span>11:05</span>
+                            <div class="status-icons">
+                                <span>📶</span>
+                                <span>🔋</span>
+                            </div>
+                        </div>
+                        <div class="safari-container">
+                            <div class="safari-url-bar">
+                                <span class="safari-lock">🔓</span>
+                                <span class="safari-url"><span class="domain suspicious">telegram-secure.net</span>/login</span>
+                                <span class="safari-refresh">↻</span>
+                            </div>
+                            <div class="safari-content">
+                                <div class="telegram-login">
+                                    <div class="telegram-logo">✈️</div>
+                                    <div class="telegram-title">Telegram</div>
+                                    <div class="telegram-subtitle">보안 확인이 필요합니다<br>계정 정보를 입력해주세요</div>
+
+                                    <input type="text" class="telegram-input" placeholder="전화번호 또는 사용자명" disabled>
+                                    <input type="password" class="telegram-input" placeholder="비밀번호" disabled>
+                                    <button class="telegram-btn" disabled>로그인</button>
+
+                                    <a href="#" class="telegram-forgot">비밀번호를 잊으셨나요?</a>
+
+                                    <div class="telegram-warning">
+                                        ⚠️ 비정상적인 로그인 시도가 감지되었습니다. 본인 확인을 위해 다시 로그인해주세요.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="padding: 16px; background: #f2f2f7; text-align: center;">
+                            <p style="color: #8e8e93; font-size: 0.8em; margin-bottom: 12px;">이 화면은 QR코드 촬영 후 연결된 페이지입니다</p>
+                            <div class="qr-code" id="${qrId}" style="margin: 0 auto;"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderMalwareScenario(qrId) {
+            return `
+                <div class="phone-mockup">
+                    <div class="phone-notch">
+                        <div class="phone-speaker"></div>
+                        <div class="phone-camera"></div>
+                    </div>
+                    <div class="phone-screen">
+                        <div class="phone-status-bar" style="background: #fff;">
+                            <span>14:32</span>
+                            <div class="status-icons">
+                                <span>📶</span>
+                                <span>🔋</span>
+                            </div>
+                        </div>
+                        <div class="playstore-container">
+                            <div class="playstore-header">
+                                <span class="playstore-back">←</span>
+                                <div class="playstore-search">🔍 앱 및 게임 검색</div>
+                            </div>
+
+                            <div class="playstore-app">
+                                <div class="playstore-icon" style="background: linear-gradient(135deg, #1a73e8, #4285f4);">🏛️</div>
+                                <div class="playstore-info">
+                                    <h2>정부24 보안인증</h2>
+                                    <div class="playstore-developer suspicious">gov24-security.com</div>
+                                    <div class="playstore-meta">
+                                        <span>⭐ 4.8</span>
+                                        <span>📥 10만+</span>
+                                        <span>3+</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button class="playstore-install-btn">설치</button>
+
+                            <div class="playstore-permissions">
+                                <div class="playstore-permissions-title">
+                                    <span style="color: #d93025;">⚠️</span>
+                                    이 앱에서 요청하는 권한
+                                </div>
+
+                                <div class="playstore-permission-item">
+                                    <span class="playstore-permission-icon">📱</span>
+                                    <div>
+                                        <div class="playstore-permission-text">기기 및 통화 정보</div>
+                                        <div class="playstore-permission-desc">IMEI, 전화번호 읽기</div>
+                                    </div>
+                                </div>
+                                <div class="playstore-permission-item">
+                                    <span class="playstore-permission-icon">💬</span>
+                                    <div>
+                                        <div class="playstore-permission-text">SMS 메시지</div>
+                                        <div class="playstore-permission-desc">SMS 읽기 및 전송</div>
+                                    </div>
+                                </div>
+                                <div class="playstore-permission-item">
+                                    <span class="playstore-permission-icon">📇</span>
+                                    <div>
+                                        <div class="playstore-permission-text">연락처</div>
+                                        <div class="playstore-permission-desc">연락처 읽기 및 수정</div>
+                                    </div>
+                                </div>
+                                <div class="playstore-permission-item">
+                                    <span class="playstore-permission-icon">📷</span>
+                                    <div>
+                                        <div class="playstore-permission-text">카메라 및 마이크</div>
+                                        <div class="playstore-permission-desc">사진 촬영, 동영상 녹화, 오디오 녹음</div>
+                                    </div>
+                                </div>
+                                <div class="playstore-permission-item">
+                                    <span class="playstore-permission-icon">📍</span>
+                                    <div>
+                                        <div class="playstore-permission-text">위치</div>
+                                        <div class="playstore-permission-desc">정확한 위치(GPS 기반)</div>
+                                    </div>
+                                </div>
+                                <div class="playstore-permission-item">
+                                    <span class="playstore-permission-icon">📂</span>
+                                    <div>
+                                        <div class="playstore-permission-text">저장공간</div>
+                                        <div class="playstore-permission-desc">모든 파일 읽기 및 쓰기</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="qr-section" style="margin-top: 0;">
+                                <p style="color: #666; font-size: 0.8em; margin-bottom: 12px;">위 화면은 QR코드 촬영 후 연결된 페이지입니다</p>
+                                <div class="qr-code" id="${qrId}"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderBankScenario(qrId) {
+            return `
+                <div class="phone-mockup">
+                    <div class="phone-notch">
+                        <div class="phone-speaker"></div>
+                        <div class="phone-camera"></div>
+                    </div>
+                    <div class="phone-screen">
+                        <div class="phone-status-bar" style="background: #ffbc00;">
+                            <span>16:47</span>
+                            <div class="status-icons">
+                                <span>📶</span>
+                                <span>🔋</span>
+                            </div>
+                        </div>
+                        <div class="kb-container">
+                            <div class="kb-header">
+                                <div class="kb-logo">KB국민은행</div>
+                                <div class="kb-title">이상거래 탐지 알림</div>
+                            </div>
+
+                            <div class="kb-alert">
+                                <div class="kb-alert-header">
+                                    <div class="kb-alert-icon">⚠️</div>
+                                    <div>
+                                        <div class="kb-alert-title">해외 부정결제 의심</div>
+                                        <div class="kb-alert-subtitle">즉시 확인이 필요합니다</div>
+                                    </div>
+                                </div>
+                                <div class="kb-alert-body">
+                                    <div class="kb-transaction">
+                                        <div class="kb-transaction-row">
+                                            <span class="kb-transaction-label">거래일시</span>
+                                            <span class="kb-transaction-value">2025.01.20 16:42:33</span>
+                                        </div>
+                                        <div class="kb-transaction-row">
+                                            <span class="kb-transaction-label">거래유형</span>
+                                            <span class="kb-transaction-value danger">해외 온라인결제</span>
+                                        </div>
+                                        <div class="kb-transaction-row">
+                                            <span class="kb-transaction-label">결제금액</span>
+                                            <span class="kb-transaction-value danger">USD 892.00</span>
+                                        </div>
+                                        <div class="kb-transaction-row">
+                                            <span class="kb-transaction-label">가맹점</span>
+                                            <span class="kb-transaction-value">AMAZON.COM</span>
+                                        </div>
+                                        <div class="kb-transaction-row">
+                                            <span class="kb-transaction-label">카드번호</span>
+                                            <span class="kb-transaction-value">5765-12**-****-7890</span>
+                                        </div>
+                                    </div>
+
+                                    <p class="kb-message">
+                                        고객님의 카드로 <strong>해외 부정결제</strong>가 의심되는 거래가 감지되었습니다.<br><br>
+                                        본인 거래가 아닌 경우, 아래 QR코드를 촬영하여 <strong style="color: #ff4757;">즉시 거래를 취소</strong>해주세요.
+                                    </p>
+
+                                    <div class="qr-section" style="background: #f8f8f8; margin: 0;">
+                                        <div class="qr-code" id="${qrId}"></div>
+                                        <p class="qr-instruction" style="color: #ff4757;">📱 긴급 거래취소 및 카드정지</p>
+                                    </div>
+
+                                    <button class="kb-btn" style="margin-top: 16px;">고객센터 연결 (1588-9999)</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ============================================
+        // Navigation Functions
+        // ============================================
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.start-screen, .sim-screen').forEach(screen => {
+                screen.classList.add('hidden');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function backToStart() {
+            document.getElementById('guideScreen').classList.add('hidden');
+            document.getElementById('startScreen').classList.remove('hidden');
+            document.getElementById('resultModal').classList.remove('active');
+        }
+
+        // ============================================
+        // Simulation Functions
+        // ============================================
+
+        function startSimulation() {
             currentScenario = 0;
-            score = 0;
-            correctAnswers = 0;
-            wrongAnswers = 0;
-
-            updateScoreBoard();
-
-            document.getElementById('startScreen').style.display = 'none';
-            document.getElementById('guideScreen').style.display = 'none';
-            document.getElementById('resultScreen').style.display = 'none';
-            document.getElementById('gameScreen').style.display = 'block';
-            document.getElementById('scoreBoard').style.display = 'flex';
-            document.getElementById('progressContainer').style.display = 'block';
-
+            results = [];
             showScenario(currentScenario);
         }
 
         function showScenario(index) {
             const scenario = scenarios[index];
-            const progress = ((index) / scenarios.length) * 100;
+            const qrId = `qr-${scenario.id}`;
+            const simScreen = document.getElementById('simScreen');
 
-            document.getElementById('progressBar').style.width = progress + '%';
-            document.getElementById('progressText').textContent = `${index + 1}/${scenarios.length}`;
+            // Generate progress dots
+            const progressDots = scenarios.map((s, i) => {
+                let dotClass = 'sim-progress-dot';
+                if (i < index) dotClass += ' completed';
+                else if (i === index) dotClass += ' active';
+                return `<div class="${dotClass}"></div>`;
+            }).join('');
 
-            let choicesHTML = scenario.choices.map((choice, i) =>
-                `<button class="choice-btn" onclick="checkAnswer(${i})">${choice.text}</button>`
-            ).join('');
+            simScreen.innerHTML = `
+                <div class="sim-header">
+                    <div class="sim-progress">${progressDots}</div>
+                    <span class="sim-type-badge">${scenario.type}</span>
+                </div>
 
-            document.getElementById('gameScreen').innerHTML = `
-                <div class="scenario-container">
-                    <div class="scenario-header">
-                        <span class="scenario-type">${scenario.type}</span>
-                        <span class="scenario-number">시나리오 ${index + 1} / ${scenarios.length}</span>
-                    </div>
-                    ${scenario.content}
-                    <div class="choices">
-                        <h3>❓ ${scenario.question}</h3>
-                        <div id="choiceButtons">
-                            ${choicesHTML}
-                        </div>
-                    </div>
-                    <div class="feedback-panel" id="feedbackPanel"></div>
+                ${scenario.renderPhone(qrId)}
+
+                <div class="sim-instruction">
+                    📱 QR코드를 스마트폰으로 촬영하거나<br>
+                    아래 버튼을 눌러 결과를 확인하세요
+                </div>
+
+                <button class="btn btn-primary" onclick="showResult(${index})">🔍 QR코드 분석 결과 보기</button>
+                <button class="btn btn-secondary" onclick="backToStart()">🏠 메인으로</button>
+            `;
+
+            showScreen('simScreen');
+
+            // Generate QR code
+            setTimeout(() => {
+                const qrContainer = document.getElementById(qrId);
+                if (qrContainer) {
+                    qrContainer.innerHTML = '';
+                    const qrUrl = `${BASE_URL}?scenario=${scenario.id}&action=scan`;
+                    new QRCode(qrContainer, {
+                        text: qrUrl,
+                        width: 140,
+                        height: 140,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                }
+            }, 100);
+        }
+
+        function showResult(index) {
+            const scenario = scenarios[index];
+            const result = scenario.result;
+            const modal = document.getElementById('resultModal');
+            const content = document.getElementById('resultContent');
+
+            const titleClass = result.isDanger ? 'danger' : 'safe';
+            const headerBg = result.isDanger
+                ? 'linear-gradient(135deg, rgba(233, 69, 96, 0.2), rgba(255, 107, 107, 0.1))'
+                : 'linear-gradient(135deg, rgba(74, 222, 128, 0.2), rgba(34, 197, 94, 0.1))';
+
+            content.innerHTML = `
+                <div class="result-header" style="background: ${headerBg}; border-radius: 0 0 30px 30px;">
+                    <div class="result-icon">${result.icon}</div>
+                    <h2 class="result-title ${titleClass}">${result.title}</h2>
+                    <p class="result-subtitle">${scenario.type} 시나리오</p>
+                </div>
+
+                <div class="result-section">
+                    <h3><span>🔍</span> 이 QR코드의 정체</h3>
+                    <ul>
+                        ${result.whatHappened.map(item => `<li>${item}</li>`).join('')}
+                    </ul>
+                </div>
+
+                <div class="result-section">
+                    <h3><span>💀</span> 촬영했다면 발생했을 일</h3>
+                    <ul>
+                        ${result.consequences.map(item => `<li>${item}</li>`).join('')}
+                    </ul>
+                </div>
+
+                <div class="result-section">
+                    <h3 class="safe"><span>🛡️</span> 올바른 대응 방법</h3>
+                    <ul>
+                        ${result.prevention.map(item => `<li>${item}</li>`).join('')}
+                    </ul>
+                </div>
+
+                <div class="result-section" style="background: rgba(0, 217, 255, 0.1); border-color: rgba(0, 217, 255, 0.3);">
+                    <h3 style="color: var(--primary-blue);"><span>📞</span> 피해 신고 및 확인</h3>
+                    <ul>
+                        <li><strong>한국인터넷진흥원(KISA)</strong>: 국번없이 118</li>
+                        <li><strong>보호나라 카카오톡 채널</strong>: '큐싱 확인서비스'</li>
+                        <li><strong>경찰청 사이버범죄 신고</strong>: 182</li>
+                    </ul>
+                </div>
+
+                <div class="result-actions">
+                    ${index < scenarios.length - 1
+                        ? `<button class="btn btn-primary" onclick="nextScenario()">다음 시나리오 ▶</button>`
+                        : `<button class="btn btn-primary" onclick="showFinalResult()">🏆 최종 결과 보기</button>`
+                    }
+                    <button class="btn btn-secondary" onclick="closeResult()">닫기</button>
+                </div>
+            `;
+
+            modal.classList.add('active');
+        }
+
+        function closeResult() {
+            document.getElementById('resultModal').classList.remove('active');
+        }
+
+        function nextScenario() {
+            closeResult();
+            currentScenario++;
+            showScenario(currentScenario);
+        }
+
+        function showFinalResult() {
+            const modal = document.getElementById('resultModal');
+            const content = document.getElementById('resultContent');
+
+            content.innerHTML = `
+                <div class="result-header" style="background: linear-gradient(135deg, rgba(74, 222, 128, 0.2), rgba(34, 197, 94, 0.1)); border-radius: 0 0 30px 30px;">
+                    <div class="result-icon">🎓</div>
+                    <h2 class="result-title safe">훈련 완료!</h2>
+                    <p class="result-subtitle">모든 시나리오를 체험하셨습니다</p>
+                </div>
+
+                <div class="result-section">
+                    <h3 style="color: var(--primary-blue);"><span>📊</span> 학습 요약</h3>
+                    <p>총 <strong>${scenarios.length}개</strong>의 큐싱 공격 시나리오를 체험하셨습니다.</p>
+                    <ul>
+                        <li><strong>싱크탱크 사칭</strong>: 자문 요청을 빙자한 악성 QR코드</li>
+                        <li><strong>택배 사칭</strong>: 관세 납부 유도 피싱</li>
+                        <li><strong>SNS 피싱</strong>: 가짜 로그인 페이지</li>
+                        <li><strong>악성앱 유도</strong>: 과도한 권한 요청 앱</li>
+                        <li><strong>금융기관 사칭</strong>: 이상거래 알림 피싱</li>
+                    </ul>
+                </div>
+
+                <div class="result-section">
+                    <h3 class="safe"><span>✅</span> 핵심 기억사항</h3>
+                    <ul>
+                        <li>출처가 불분명한 QR코드는 <strong>절대</strong> 촬영하지 마세요</li>
+                        <li>URL 주소와 보안 연결(🔒)을 항상 확인하세요</li>
+                        <li>긴급함을 강조하는 메시지는 피싱일 가능성이 높습니다</li>
+                        <li>앱은 반드시 공식 스토어에서만 설치하세요</li>
+                        <li>의심되면 해당 기관에 직접 전화로 확인하세요</li>
+                    </ul>
+                </div>
+
+                <div class="result-actions">
+                    <button class="btn btn-primary" onclick="startSimulation()">🔄 다시 체험하기</button>
+                    <button class="btn btn-secondary" onclick="backToStart()">🏠 메인으로</button>
                 </div>
             `;
         }
 
-        function checkAnswer(choiceIndex) {
-            const scenario = scenarios[currentScenario];
-            const choice = scenario.choices[choiceIndex];
-            const buttons = document.querySelectorAll('.choice-btn');
-            const feedbackPanel = document.getElementById('feedbackPanel');
-
-            // Disable all buttons
-            buttons.forEach((btn, i) => {
-                btn.disabled = true;
-                if (scenario.choices[i].correct) {
-                    btn.classList.add('correct');
-                } else if (i === choiceIndex && !choice.correct) {
-                    btn.classList.add('wrong');
-                }
-            });
-
-            // Update score
-            if (choice.correct) {
-                score += 20;
-                correctAnswers++;
-                feedbackPanel.className = 'feedback-panel correct';
-                feedbackPanel.innerHTML = `
-                    <h4>✅ ${scenario.correctFeedback}</h4>
-                    <div class="tips">
-                        <h5>💡 기억하세요!</h5>
-                        <ul>
-                            ${scenario.tips.map(tip => `<li>${tip}</li>`).join('')}
-                        </ul>
-                    </div>
-                `;
-            } else {
-                wrongAnswers++;
-                feedbackPanel.className = 'feedback-panel wrong';
-                feedbackPanel.innerHTML = `
-                    <h4>❌ ${scenario.wrongFeedback}</h4>
-                    <div class="tips">
-                        <h5>💡 올바른 대응 방법:</h5>
-                        <ul>
-                            ${scenario.tips.map(tip => `<li>${tip}</li>`).join('')}
-                        </ul>
-                    </div>
-                `;
-                document.querySelector('.scenario-container').classList.add('shake');
-            }
-
-            feedbackPanel.style.display = 'block';
-
-            updateScoreBoard();
-
-            // Add next button
-            const nextBtn = document.createElement('button');
-            nextBtn.className = 'btn btn-primary next-btn';
-            nextBtn.textContent = currentScenario < scenarios.length - 1 ? '다음 시나리오 ▶' : '결과 보기 🏆';
-            nextBtn.onclick = nextScenario;
-            feedbackPanel.appendChild(nextBtn);
-        }
-
-        function nextScenario() {
-            currentScenario++;
-
-            if (currentScenario >= scenarios.length) {
-                showResult();
-            } else {
-                showScenario(currentScenario);
-            }
-        }
-
-        function updateScoreBoard() {
-            document.getElementById('currentScore').textContent = score;
-            document.getElementById('correctCount').textContent = correctAnswers;
-            document.getElementById('wrongCount').textContent = wrongAnswers;
-        }
-
-        function showResult() {
-            document.getElementById('gameScreen').style.display = 'none';
-            document.getElementById('scoreBoard').style.display = 'none';
-            document.getElementById('progressContainer').style.display = 'none';
-            document.getElementById('resultScreen').style.display = 'block';
-
-            document.getElementById('progressBar').style.width = '100%';
-            document.getElementById('finalCorrect').textContent = correctAnswers;
-            document.getElementById('finalWrong').textContent = wrongAnswers;
-            document.getElementById('finalScore').textContent = score;
-
-            const percentage = (correctAnswers / scenarios.length) * 100;
-            let icon, title, titleClass, message, advice;
-
-            if (percentage >= 80) {
-                icon = '🏆';
-                title = '피싱 방어 전문가!';
-                titleClass = 'success';
-                message = '뛰어난 피싱 인식 능력을 갖추고 계십니다!';
-                advice = `
-                    <h4 style="color: #4ade80;">🎉 우수한 보안 인식 수준입니다!</h4>
-                    <p>피싱 공격의 특징을 잘 파악하고 있습니다. 이 지식을 주변 사람들에게도 공유해주세요.</p>
-                    <ul style="margin-top: 15px; padding-left: 20px;">
-                        <li>가족과 동료에게 피싱 수법을 알려주세요</li>
-                        <li>의심스러운 메시지를 발견하면 보호나라에 신고해주세요</li>
-                        <li>정기적으로 보안 인식을 점검하는 습관을 유지하세요</li>
-                    </ul>
-                `;
-            } else if (percentage >= 60) {
-                icon = '👍';
-                title = '기본기 탄탄!';
-                titleClass = 'warning';
-                message = '기본적인 피싱 인식 능력을 갖추고 계십니다.';
-                advice = `
-                    <h4 style="color: #fbbf24;">📚 조금 더 학습이 필요합니다</h4>
-                    <p>기본적인 피싱 수법은 파악하고 있지만, 교묘한 수법에는 취약할 수 있습니다.</p>
-                    <ul style="margin-top: 15px; padding-left: 20px;">
-                        <li>URL과 발신자 주소를 더 꼼꼼히 확인하는 습관을 기르세요</li>
-                        <li>긴박함을 조성하는 메시지에 침착하게 대응하세요</li>
-                        <li>대응 가이드를 다시 한번 읽어보시길 권장합니다</li>
-                    </ul>
-                `;
-            } else {
-                icon = '⚠️';
-                title = '주의가 필요합니다';
-                titleClass = 'danger';
-                message = '피싱 공격에 취약한 상태입니다. 교육이 필요합니다.';
-                advice = `
-                    <h4 style="color: #e94560;">🚨 피싱 피해 위험이 높습니다</h4>
-                    <p>실제 피싱 공격을 받을 경우 피해를 입을 가능성이 높습니다. 반드시 대응 가이드를 숙지해주세요.</p>
-                    <ul style="margin-top: 15px; padding-left: 20px;">
-                        <li><strong>절대</strong> 출처가 불분명한 QR코드를 촬영하지 마세요</li>
-                        <li>의심이 들면 항상 공식 채널을 통해 확인하세요</li>
-                        <li>앱은 공식 스토어에서만 다운로드하세요</li>
-                        <li>긴박한 메시지일수록 침착하게 대응하세요</li>
-                    </ul>
-                `;
-            }
-
-            document.getElementById('resultIcon').textContent = icon;
-            document.getElementById('resultTitle').textContent = title;
-            document.getElementById('resultTitle').className = 'result-title ' + titleClass;
-            document.getElementById('resultMessage').textContent = message;
-            document.getElementById('resultAdvice').innerHTML = advice;
-        }
-
-        function restartGame() {
-            startGame();
-        }
+        // ============================================
+        // Guide Functions
+        // ============================================
 
         function showGuide() {
-            document.getElementById('startScreen').style.display = 'none';
-            document.getElementById('gameScreen').style.display = 'none';
-            document.getElementById('resultScreen').style.display = 'none';
-            document.getElementById('scoreBoard').style.display = 'none';
-            document.getElementById('progressContainer').style.display = 'none';
-            document.getElementById('guideScreen').style.display = 'block';
+            showScreen('guideScreen');
+            switchGuideTab('what');
         }
 
-        function backToStart() {
-            document.getElementById('guideScreen').style.display = 'none';
-            document.getElementById('startScreen').style.display = 'block';
+        function switchGuideTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const guideContent = document.getElementById('guideContent');
+
+            const guides = {
+                what: `
+                    <div class="result-section">
+                        <h3><span>🚨</span> 큐싱(Quishing)이란?</h3>
+                        <p>QR코드에 <strong>악성앱 다운로드 주소</strong> 또는 <strong>피싱사이트 주소</strong>를 포함해 유포하여 개인정보 및 금전을 탈취하는 공격 기법입니다.</p>
+                    </div>
+                    <div class="result-section">
+                        <h3><span>🎯</span> 주요 공격 유형</h3>
+                        <ul>
+                            <li>싱크탱크/정부기관 직원 사칭으로 자문 요청</li>
+                            <li>택배/배송 관련 관세 납부 유도</li>
+                            <li>SNS/메신저 보안 확인 명목 로그인 유도</li>
+                            <li>정부 앱 사칭 악성앱 설치 유도</li>
+                            <li>금융기관 사칭 이상거래 알림</li>
+                        </ul>
+                    </div>
+                    <div class="result-section">
+                        <h3><span>⚠️</span> 위험 신호</h3>
+                        <ul>
+                            <li>공식 도메인과 유사하지만 다른 URL</li>
+                            <li>긴급함을 강조하는 메시지</li>
+                            <li>금전적 이익을 미끼로 사용</li>
+                            <li>공식 스토어 외 앱 설치 유도</li>
+                            <li>과도한 권한 요청</li>
+                        </ul>
+                    </div>
+                `,
+                prevent: `
+                    <div class="result-section">
+                        <h3 class="safe"><span>🛡️</span> 예방 수칙</h3>
+                        <ul>
+                            <li>출처가 불분명한 QR코드는 <strong>절대 촬영하지 마세요</strong></li>
+                            <li>URL이 공식 도메인인지 항상 확인하세요</li>
+                            <li>보안 연결(🔒 HTTPS)인지 확인하세요</li>
+                            <li>개인정보는 신뢰된 사이트에만 입력하세요</li>
+                            <li>앱은 공식 스토어에서만 다운로드하세요</li>
+                        </ul>
+                    </div>
+                    <div class="result-section">
+                        <h3><span>📱</span> 스마트폰 보안 설정</h3>
+                        <ul>
+                            <li><strong>출처를 알 수 없는 앱 설치</strong>를 비활성화하세요</li>
+                            <li>모바일 백신을 설치하고 정기 검사하세요</li>
+                            <li>이동통신사의 <strong>번호도용문자차단서비스</strong>를 신청하세요</li>
+                            <li>소액결제 한도를 최소로 설정하세요</li>
+                        </ul>
+                    </div>
+                    <div class="result-section">
+                        <h3><span>🔍</span> 의심 시 확인 방법</h3>
+                        <ul>
+                            <li>보호나라 카카오톡 채널: '큐싱 확인서비스'</li>
+                            <li>한국인터넷진흥원(KISA): 118</li>
+                            <li>해당 기관 공식 대표번호로 직접 확인</li>
+                        </ul>
+                    </div>
+                `,
+                response: `
+                    <div class="result-section">
+                        <h3><span>🆘</span> 악성앱 설치 시 대응</h3>
+                        <ul>
+                            <li>모바일 백신으로 즉시 악성앱 삭제</li>
+                            <li>설정 > 앱 목록에서 의심 앱 직접 삭제</li>
+                            <li>백신으로 해결 안되면 서비스센터 방문</li>
+                            <li>스마트폰 초기화 고려</li>
+                        </ul>
+                    </div>
+                    <div class="result-section">
+                        <h3><span>💳</span> 금융정보 유출 시 대응</h3>
+                        <ul>
+                            <li>공동인증서 즉시 폐기 및 재발급</li>
+                            <li>통신사 고객센터에서 모바일 결제 내역 확인</li>
+                            <li>피해 확인 시 관할 경찰서 사이버수사대 신고</li>
+                            <li>금융기관 고객센터에 카드 정지 요청</li>
+                        </ul>
+                    </div>
+                    <div class="result-section">
+                        <h3><span>📞</span> 신고 연락처</h3>
+                        <ul>
+                            <li><strong>KISA 사이버민원센터</strong>: 118</li>
+                            <li><strong>경찰청 사이버범죄 신고</strong>: 182</li>
+                            <li><strong>금융감독원</strong>: 1332</li>
+                            <li><strong>보호나라 카카오톡 채널</strong>: 스미싱/큐싱 확인서비스</li>
+                        </ul>
+                    </div>
+                    <div class="result-section">
+                        <h3><span>👥</span> 2차 피해 예방</h3>
+                        <ul>
+                            <li>주변 지인에게 피해 사실 알리기</li>
+                            <li>SNS/메신저 비밀번호 변경</li>
+                            <li>연동된 다른 서비스 비밀번호도 변경</li>
+                            <li>이상한 메시지 발송 여부 확인</li>
+                        </ul>
+                    </div>
+                `
+            };
+
+            guideContent.innerHTML = guides[tab];
         }
+
+        // ============================================
+        // URL Parameter Handling (for QR scan)
+        // ============================================
+
+        function checkUrlParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const scenarioId = urlParams.get('scenario');
+            const action = urlParams.get('action');
+
+            if (scenarioId && action === 'scan') {
+                const scenarioIndex = scenarios.findIndex(s => s.id === scenarioId);
+                if (scenarioIndex !== -1) {
+                    // Show loading then result
+                    const loadingOverlay = document.getElementById('loadingOverlay');
+                    loadingOverlay.classList.add('active');
+
+                    setTimeout(() => {
+                        loadingOverlay.classList.remove('active');
+                        currentScenario = scenarioIndex;
+                        showScenario(scenarioIndex);
+
+                        setTimeout(() => {
+                            showResult(scenarioIndex);
+                        }, 500);
+                    }, 1500);
+
+                    // Clean URL
+                    window.history.replaceState({}, document.title, BASE_URL);
+                }
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            checkUrlParams();
+        });
     </script>
 </body>
 </html>
